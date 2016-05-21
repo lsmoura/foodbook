@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "dispatchjs": "git+https://github.com/lsmoura/dispatchjs.git"
+    "dispatchjs": "git+https://github.com/lsmoura/dispatchjs.git",
+    "sqlite3": "^3.1.4"
   }
 }
