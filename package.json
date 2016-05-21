@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "dispatchjs": "git+https://github.com/lsmoura/dispatchjs.git"
+  }
+}
