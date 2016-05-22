@@ -126,21 +126,21 @@ function foodbook_init() {
 		})
 	};
 
+	var addFavoritesProduct = function(product_id) {
+		var product = getProductById(product_id);
+
+		if (!product)
+			return(false);
+
+		var row = jQuery('<tr/>').addClass('product').attr('id', 'favorite-' + product_id);
+		row.append('<td><span class="name">' + product.name + '</span><div class="description">' + (product.description || 'no descrpition')  + '</div></td>');
+		row.append('<td>' + product.code + '</td>');
+		row.append('<td>' + product.manufacturer + '</td>');
+		row.append('<td>' + product.case_size + '</td>');
+		jQuery('#wishlist-table tbody').append(row);
+	};
+
 	var loadFavorites = function(callback) {
-		var addProduct = function(product_id) {
-			var product = getProductById(product_id);
-
-			if (!product)
-				return(false);
-
-			var row = jQuery('<tr/>').addClass('product');
-			row.append('<td><span class="name">' + product.name + '</span><div class="description">' + (product.description || 'no descrpition')  + '</div></td>');
-			row.append('<td>' + product.code + '</td>');
-			row.append('<td>' + product.manufacturer + '</td>');
-			row.append('<td>' + product.case_size + '</td>');
-			jQuery('#wishlist-table tbody').append(row);
-		};
-
 		jQuery('#wishlist-table tbody').html('');
 
 		jQuery.ajax('/favorite').done(function(data) {
@@ -151,7 +151,7 @@ function foodbook_init() {
 				var tr = jQuery('#product-' + favorites[i]);
 				tr.addClass('favorite');
 				tr.attr('data-favorite', true);
-				addProduct(favorites[i]);
+				addFavoritesProduct(favorites[i]);
 			}
 		});
 
@@ -268,12 +268,14 @@ function foodbook_init() {
 			if (data.favorite == true) {
 				// Add to favorites
 				favorites.push(data.product_id);
+				addFavoritesProduct(data.product_id);
 			}
 			else {
 				// Remove from favorites
 				var idx = favorites.indexOf(data.product_id);
 				if (idx > -1)
 					favorites.splice(idx, 1);
+				jQuery('#favorite-' + data.product_id).remove();
 			}
 		});
 	});
