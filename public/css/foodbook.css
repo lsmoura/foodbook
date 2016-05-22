@@ -1,0 +1,37 @@
+.site-section {
+    display: none;
+}
+
+.product .description {
+	display: none;
+	font-size: smaller;
+}
+
+.product:hover .description {
+	display: block;
+}
+
+.product .on, .product .off {
+	cursor: pointer;
+}
+
+.product .on { display: none; }
+.product .off { display: inline-block; }
+
+.product.favorite .on { display: inline-block; }
+.product.favorite .off { display: none; }
+
+.host-only-menu { display: none; }
+body.host .host-only-menu { display: inline-block; }
+
+#footer {
+	margin-top: 1em;
+	padding: 0.5em 2em;
+	background-color: #ccc;
+	font-size: smaller;
+}
+
+#footer p {
+	padding: 0;
+	margin: 0;
+}

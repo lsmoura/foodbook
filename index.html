@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Food Book</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+	<link rel="stylesheet" href="/css/foodbook.css">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<script src="/js/foodbook.js"></script>
+	<script>jQuery(document).ready(foodbook_init);</script>
+</head>
+<body>
+	<nav class="navbar navbar-default">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#fb-header" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/">FoodBook</a>
+			</div>
+			<div class="collapse navbar-collapse" id="fb-header">
+				<ul class="nav navbar-nav" id="head-menu">
+					<li class="active"><a href="/">Home</a></li>
+					<li class="" id="li-profile"><a href="#" id="btn-profile">Profile</a></li>
+					<li class="" id="li-products"><a href="#" id="btn-products">Products</a></li>
+					<li class="" id="li-wishlist"><a href="#" id="btn-wishlist">Wishlist</a></li>
+					<li class="host-only-menu" id="li-myproducts"><a href="#" id="btn-myproducts">My Products</a></li>
+					<li class=""><a href="/near">Near me</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li class=""><a href="/logout">Logout</a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<div id="messages"></div>
+	<div class="container">
+		<div id="profile" class="site-section">
+			<h2>Profile</h2>
+			<div>
+				<label for="name">Name</label>
+				<input class="form-control" type="text" name="name" id="name">
+			</div>
+			<div>
+				<label for="email">E-Mail</label>
+				<input class="form-control" type="text" name="email" id="email">
+			</div>
+			<div>
+				<label for="zip">Zip Code</label>
+				<input class="form-control" type="text" name="zip" id="zip">
+			</div>
+			<div>
+				<label for="description">Description</label>
+				<textarea class="form-control" rows="10" type="text" name="description" id="description"></textarea>
+			</div>
+			<div class="pull-right">
+				<button class="btn btn-default" id="btn-profile-reload">Reload</button>
+				<button class="btn btn-primary" id="btn-profile-save">Save</button>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+		<div id="products" class="site-section">
+			<h2>Products</h2>
+			<table class="table" id="products-table">
+				<thead>
+					<tr>
+						<th></th>
+						<th>Product</th>
+						<th>Code</th>
+						<th>Manufacturer</th>
+						<th>Case Site</th>
+					<tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+			<div class="pull-right">
+				<button class="btn btn-disabled host-only-btn" id="btn-products-add">Add</button>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+		<div id="wishlist" class="site-section">
+			<h2>My Wishlist</h2>
+			<table class="table" id="wishlist-table">
+				<thead>
+					<tr>
+						<th>Product</th>
+						<th>Code</th>
+						<th>Manufacturer</th>
+						<th>Case Site</th>
+					<tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+			<div class="pull-right">
+				<button class="btn btn-default" id="btn-wishlist-reload">Reload</button>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+	</div>
+	<footer id="footer">
+		<p>Healthy food social network created by Sergio Moura for the <strong>Shopidarity</strong> Vanhackathon challenge</p>
+	</footer>
+</body>
+</html>
