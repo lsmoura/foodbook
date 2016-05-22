@@ -99,27 +99,31 @@ function foodbook_init() {
 			products = data;
 			console.log(data);
 
-			jQuery('#products-table tbody').html('');
-
-			products.forEach(function(product) {
-				var row = jQuery('<tr/>').attr('data-id', product.id).addClass('product').attr('id', 'product-' + product.id);
-				row.attr('data-favorite', false);
-				var cmd = '<span class="glyphicon glyphicon-star on favorite-toggle"></span>';
-				cmd += '<span class="glyphicon glyphicon-star-empty off favorite-toggle"></span>';
-
-				if (myProfile.host) 
-					cmd += '<span class="glyphicon glyphicon-plus myproducts-add"></span>';
-
-				row.append('<td>' + cmd + '</td>');
-				row.append('<td><span class="name">' + product.name + '</span><div class="description">' + (product.description || 'no descrpition')  + '</div></td>');
-				row.append('<td>' + product.code + '</td>');
-				row.append('<td>' + product.manufacturer + '</td>');
-				row.append('<td>' + product.case_size + '</td>');
-				jQuery('#products-table tbody').append(row);
-			})
+			buildProductsTable();
 
 			loadFavorites(callback);
 		});
+	};
+
+	var buildProductsTable = function() {
+		jQuery('#products-table tbody').html('');
+
+		products.forEach(function(product) {
+			var row = jQuery('<tr/>').attr('data-id', product.id).addClass('product').attr('id', 'product-' + product.id);
+			row.attr('data-favorite', false);
+			var cmd = '<span class="glyphicon glyphicon-star on favorite-toggle"></span>';
+			cmd += '<span class="glyphicon glyphicon-star-empty off favorite-toggle"></span>';
+
+			if (myProfile.host) 
+				cmd += '<span class="glyphicon glyphicon-plus myproducts-add"></span>';
+
+			row.append('<td>' + cmd + '</td>');
+			row.append('<td><span class="name">' + product.name + '</span><div class="description">' + (product.description || 'no descrpition')  + '</div></td>');
+			row.append('<td>' + product.code + '</td>');
+			row.append('<td>' + product.manufacturer + '</td>');
+			row.append('<td>' + product.case_size + '</td>');
+			jQuery('#products-table tbody').append(row);
+		})
 	};
 
 	var loadFavorites = function(callback) {
@@ -200,6 +204,13 @@ function foodbook_init() {
 		jQuery('#products').show();
 	});
 
+	jQuery('#btn-products-add').on('click', function(event) {
+		if (!myProfile.host)
+			return;
+
+		jQuery('.site-section').hide();
+		jQuery('#newproduct').show();
+	});
 	jQuery('#btn-wishlist').on('click', function(event) {
 		jQuery('#head-menu li').removeClass('active');
 		jQuery('#li-wishlist').addClass('active');
@@ -303,6 +314,47 @@ function foodbook_init() {
 
 			jQuery('#myproduct-' + id).remove();
 		});
+	});
+
+	jQuery('#btn-newproduct-save').on('click', function(event) {
+		var xmap = {
+			'name': '#newproduct-name',
+			'code': '#newproduct-code',
+			'manufacturer': '#newproduct-manufacturer',
+			'case_size': '#newproduct-casesize',
+			'description': '#newproduct-description'
+		};
+
+		var obj = {};
+
+		// Auto
+		var keys = Object.keys(xmap);
+		var i, l = keys.length;
+		for(i = 0; i < l; i++)
+			obj[keys[i]] = jQuery(xmap[keys[i]]).val();
+
+		json_post('/products/new', obj, function(data) {
+			if (!data.id) {
+				timedMessage('Something went wrong when creating a new product...', 5000, 'bg-danger');
+				return;
+			}
+
+			products.push(data);
+			buildProductsTable();
+
+			jQuery('.site-section').hide();
+			jQuery('#products').show();
+
+			// Clear form
+			var i, l = keys.length;
+			for(i = 0; i < l; i++)
+				jQuery(xmap[keys[i]]).val('');
+		});
+	});
+
+	jQuery('#btn-newproduct-cancel').on('click', function(event) {
+		jQuery('.site-section').hide();
+		jQuery('#products').show();
 	});
 
 	loadProfile(function(profile) {

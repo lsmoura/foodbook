@@ -226,7 +226,7 @@ dispatch.map('POST', '/register', function(ret, res) {
 	});
 });
 
-dispatch.map('GET', '/products', function(ret, res) {
+dispatch.map('GET', '/products$', function(ret, res) {
 	var self = this;
 
 	// Check login
@@ -248,6 +248,54 @@ dispatch.map('GET', '/products', function(ret, res) {
 			}
 
 			self(JSON.stringify(rows), { 'Content-Type': 'application/json' });
+		})
+	});
+});
+
+dispatch.map('POST', '/products/new$', function(ret, res) {
+	var self = this;
+
+	// Check login
+	var cookie = '';
+	if (this.headers.hasOwnProperty('cookie'))
+		cookie = this.headers.cookie;
+
+	getUser(cookie, function(err, profile) {
+		if (err) {
+			console.error(err);
+			self('{}', { 'Content-Type': 'application/json' });
+			return;
+		}
+
+		var now = moment().format('YYYY-MM-DD HH:mm:ss');
+		var fields = [
+			now,
+			now,
+			self.fields.name,
+			self.fields.code,
+			self.fields.manufacturer,
+			self.fields.case_size,
+			self.fields.description
+		];
+
+		db.run('INSERT INTO products (created, modified, name, code, manufacturer, case_size, description) VALUES (?, ?, ?, ?, ?, ?, ?)', fields, function(err, rows) {
+			if (err) {
+				console.error(err);
+				self('{}', { 'Content-Type': 'application/json' });
+			}
+
+			var obj = {
+				id: this.lastID,
+				created: now,
+				modified: now,
+				name: self.fields.name,
+				code: self.fields.code,
+				manufacturer: self.fields.manufacturer,
+				case_size: self.fields.case_size,
+				description: self.fields.description
+			};
+
+			self(JSON.stringify(obj), { 'Content-Type': 'application/json' });
 		})
 	});
 });
