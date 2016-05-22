@@ -114,20 +114,9 @@ dispatch.map('GET', '/$', function(ret, res) {
 
 });
 
-dispatch.map('GET', '/test1', function(ret, res) {
-	res.setHeader('Set-Cookie', 'testCookie1=test1&testCookie2=test2');
-
-	redirect(res, '/test');
-});
-
-
-dispatch.map('GET', '/test', function(ret, res) {
-	console.log(this.headers);
-	this(JSON.stringify(this.headers), {});
-});
-
 dispatch.map('GET', '/logout', function(ret, res) {
 	res.setHeader('Set-Cookie', 'user=');
+	redirect(res, '/login.html');
 });
 
 // Retrieve user profile
