@@ -26,7 +26,7 @@
 			</div>
 			<div class="collapse navbar-collapse" id="fb-header">
 				<ul class="nav navbar-nav" id="head-menu">
-					<li class="active"><a href="/">Home</a></li>
+					<li class="active" id="li-home"><a href="#" id="btn-home">Home</a></li>
 					<li class="" id="li-profile"><a href="#" id="btn-profile">Profile</a></li>
 					<li class="" id="li-products"><a href="#" id="btn-products">Products</a></li>
 					<li class="" id="li-wishlist"><a href="#" id="btn-wishlist">Wishlist</a></li>
@@ -41,6 +41,13 @@
 	</nav>
 	<div id="messages"></div>
 	<div class="container">
+		<div id="home" class="site-section">
+			<h1>Welcome to foodbook</h1>
+			<div>
+				<p>Here you can check the products that are available from a list of products and you will be able to receive notifications from vendors around the country, so you can find the best price for your product.</p>
+				<p>If you want to sell products for the community, you can become a host for a $20 monthly fee. Write us at our email</p>
+			</div>
+		</div>
 		<div id="profile" class="site-section">
 			<h2>Profile</h2>
 			<div>
@@ -74,7 +81,7 @@
 						<th>Product</th>
 						<th>Code</th>
 						<th>Manufacturer</th>
-						<th>Case Site</th>
+						<th>Case Size</th>
 					<tr>
 				</thead>
 				<tbody></tbody>
@@ -120,7 +127,7 @@
 						<th>Product</th>
 						<th>Code</th>
 						<th>Manufacturer</th>
-						<th>Case Site</th>
+						<th>Case Size</th>
 					<tr>
 				</thead>
 				<tbody></tbody>
@@ -138,7 +145,7 @@
 						<th>Product</th>
 						<th>Code</th>
 						<th>Manufacturer</th>
-						<th>Case Site</th>
+						<th>Case Size</th>
 						<th></th>
 					<tr>
 				</thead>
@@ -146,6 +153,25 @@
 			</table>
 			<div class="pull-right">
 				<button class="btn btn-default" id="btn-myproducts-reload">Reload</button>
+			</div>
+			<div class="clearfix"></div>
+		</div>
+		<div id="requests" class="site-section">
+			<h2>My Matched Requests</h2>
+			<table class="table" id="requests-table">
+				<thead>
+					<tr>
+						<th>Requested by</th>
+						<th>Product</th>
+						<th>Code</th>
+						<th>Manufacturer</th>
+						<th>Case Site</th>
+					<tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+			<div class="pull-right">
+				<button class="btn btn-default" id="btn-requests-reload">Reload</button>
 			</div>
 			<div class="clearfix"></div>
 		</div>

@@ -184,12 +184,45 @@ function foodbook_init() {
 
 		jQuery('#myproducts-table tbody').html('');
 
-		var i, l = favorites.length;
+		var i, l = myproducts.length;
 		for (i = 0; i < l; i++) {
 			addProduct(myproducts[i]);
 		}
-	}
+	};
 
+	var buildRequestTable = function() {
+		var addLine = function(match) {
+			var row = jQuery('<tr/>');
+			row.append('<td>' + match.user_name + '&lt;' + match.email + '&gt;</td>');
+			row.append('<td><span class="name">' + match.name + '</span><div class="description">' + (match.description || 'no descrpition')  + '</div></td>');
+			row.append('<td>' + match.code + '</td>');
+			row.append('<td>' + match.manufacturer + '</td>');
+			row.append('<td>' + match.case_size + '</td>');
+			jQuery('#requests-table tbody').append(row);
+		};
+
+		jQuery('#requests-table tbody').html('');
+
+		var i, l = mymatches.length;
+		for (i = 0; i < l; i++) {
+			addLine(mymatches[i]);
+		}
+	};
+
+	var loadRequests = function() {
+		jQuery.ajax('/requests').done(function(data) {
+			console.log(data);
+			mymatches = data;
+			buildRequestTable();
+		});
+	};
+
+	jQuery('#btn-home').on('click', function(event) {
+		jQuery('#head-menu li').removeClass('active');
+		jQuery('#li-home').addClass('active');
+		jQuery('.site-section').hide();
+		jQuery('#home').show();
+	});
 	jQuery('#btn-profile').on('click', function(event) {
 		jQuery('#head-menu li').removeClass('active');
 		jQuery('#li-profile').addClass('active');
@@ -222,6 +255,12 @@ function foodbook_init() {
 		jQuery('#li-myproducts').addClass('active');
 		jQuery('.site-section').hide();
 		jQuery('#myproducts').show();
+	});
+	jQuery('#btn-requests').on('click', function(event) {
+		jQuery('#head-menu li').removeClass('active');
+		jQuery('#li-requests').addClass('active');
+		jQuery('.site-section').hide();
+		jQuery('#requests').show();
 	});
 	jQuery('#btn-wishlist-reload').on('click', function(event) { loadFavorites(); });
 	jQuery('#btn-profile-reload').on('click', function(event) { loadProfile(); });
@@ -359,13 +398,19 @@ function foodbook_init() {
 		jQuery('#products').show();
 	});
 
+	jQuery('#btn-requests-reload').on('click', function(event) {
+		loadRequests();
+	});
+
 	loadProfile(function(profile) {
 		loadProducts(function() {
 			if (profile.host) {
 				loadMyProducts();
-				//loadRequests();
+				loadRequests();
 			}
 		});
 	});
+
+	jQuery('#home').show();
 }
 

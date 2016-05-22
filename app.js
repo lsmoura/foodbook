@@ -504,4 +504,47 @@ dispatch.map('GET', '/myproducts/remove/([0-9]*)$', function(ret, res) {
 	});
 });
 
+dispatch.map('GET', '/requests', function(ret, res) {
+	var self = this;
+	console.log(this.matches);
+	var id = this.matches[1];
+
+	// Check login
+	var cookie = '';
+	if (this.headers.hasOwnProperty('cookie'))
+		cookie = this.headers.cookie;
+
+	getUser(cookie, function(err, profile) {
+		if (err) {
+			console.error(err);
+			self('{}', { 'Content-Type': 'application/json' });
+			return;
+		}
+
+		var sql = '';
+		// We start with all products that are offerred
+		sql += 'SELECT user_products.product_id, products.*, wishlist.user_id, users.name AS user_name, users.email ';
+		sql += 'FROM user_products ';
+		// Then we get the product information
+		sql += 'JOIN products ON user_products.product_id = products.id ';
+		// Then we match with all the items available on the wishlist from everyone
+		sql += 'JOIN wishlist ON wishlist.product_id = user_products.product_id ';
+		// Then we get the user that wished for the product info
+		sql += 'JOIN users ON wishlist.user_id = users.id ';
+		// Lastly we filter only the products that is offerred by the current user
+		sql += 'WHERE user_products.user_id = ?';
+
+		db.all(sql, profile.id, function(err, rows) {
+			if (err) {
+				console.error(err);
+				self('{}', { 'Content-Type': 'application/json' });
+			}
+
+			self(JSON.stringify(rows), { 'Content-Type': 'application/json' });
+		});
+	});
+
+
+})
+
 dispatch(3000, { serve_static: true });
