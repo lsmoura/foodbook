@@ -47,6 +47,22 @@ function foodbook_init() {
 	var products = [];
 	var favorites = [];
 
+	// Hosts only feature
+	var myproducts = [];
+	var mymatches = [];
+
+	var getProductById = function(id) {
+		var product = null;
+		var i, l = products.length;
+		for (i = 0; i < l; i++)
+			if (id == products[i].id) {
+				product = products[i];
+				break;
+			}
+
+		return(product);
+	};
+
 	var updateProfileInfo = function() {
 		jQuery('#name').val(myProfile.name);
 		jQuery('#email').val(myProfile.email);
@@ -59,10 +75,11 @@ function foodbook_init() {
 		}
 	};
 
-	var loadProfile = function() {
+	var loadProfile = function(callback) {
 		jQuery.ajax('/profile').done(function(data) {
 			myProfile = data;
 			updateProfileInfo();
+			callback && callback(data);
 		});
 	};
 
@@ -77,7 +94,7 @@ function foodbook_init() {
 		return(ret);
 	}
 
-	var loadProducts = function() {
+	var loadProducts = function(callback) {
 		jQuery.ajax('/products').done(function(data) {
 			products = data;
 			console.log(data);
@@ -87,7 +104,13 @@ function foodbook_init() {
 			products.forEach(function(product) {
 				var row = jQuery('<tr/>').attr('data-id', product.id).addClass('product').attr('id', 'product-' + product.id);
 				row.attr('data-favorite', false);
-				row.append('<td><span class="glyphicon glyphicon-star on favorite-toggle"></span><span class="glyphicon glyphicon-star-empty off favorite-toggle"></span></td>');
+				var cmd = '<span class="glyphicon glyphicon-star on favorite-toggle"></span>';
+				cmd += '<span class="glyphicon glyphicon-star-empty off favorite-toggle"></span>';
+
+				if (myProfile.host) 
+					cmd += '<span class="glyphicon glyphicon-plus myproducts-add"></span>';
+
+				row.append('<td>' + cmd + '</td>');
 				row.append('<td><span class="name">' + product.name + '</span><div class="description">' + (product.description || 'no descrpition')  + '</div></td>');
 				row.append('<td>' + product.code + '</td>');
 				row.append('<td>' + product.manufacturer + '</td>');
@@ -95,19 +118,13 @@ function foodbook_init() {
 				jQuery('#products-table tbody').append(row);
 			})
 
-			loadFavorites();
+			loadFavorites(callback);
 		});
 	};
 
-	var loadFavorites = function() {
+	var loadFavorites = function(callback) {
 		var addProduct = function(product_id) {
-			var product = null;
-			var i, l = products.length;
-			for (i = 0; i < l; i++)
-				if (product_id == products[i].id) {
-					product = products[i];
-					break;
-				}
+			var product = getProductById(product_id);
 
 			if (!product)
 				return(false);
@@ -133,7 +150,41 @@ function foodbook_init() {
 				addProduct(favorites[i]);
 			}
 		});
+
+		callback && callback();
 	};
+
+	var loadMyProducts = function() {
+		jQuery.ajax('/myproducts').done(function(data) {
+			console.log(data);
+			myproducts = data;
+			rebuildMyProductsTable();
+		});
+	};
+
+	var rebuildMyProductsTable = function() {
+		var addProduct = function(product_id) {
+			var product = getProductById(product_id);
+
+			if (!product)
+				return(false);
+
+			var row = jQuery('<tr/>').addClass('product').attr('id', 'myproduct-' + product.id);
+			row.append('<td><span class="name">' + product.name + '</span><div class="description">' + (product.description || 'no descrpition')  + '</div></td>');
+			row.append('<td>' + product.code + '</td>');
+			row.append('<td>' + product.manufacturer + '</td>');
+			row.append('<td>' + product.case_size + '</td>');
+			row.append('<td><btn class="btn btn-default myproduct-remove" data-id="' + product.id + '">Remove</td>');
+			jQuery('#myproducts-table tbody').append(row);
+		};
+
+		jQuery('#myproducts-table tbody').html('');
+
+		var i, l = favorites.length;
+		for (i = 0; i < l; i++) {
+			addProduct(myproducts[i]);
+		}
+	}
 
 	jQuery('#btn-profile').on('click', function(event) {
 		jQuery('#head-menu li').removeClass('active');
@@ -155,11 +206,15 @@ function foodbook_init() {
 		jQuery('.site-section').hide();
 		jQuery('#wishlist').show();
 	});
-	jQuery('#btn-wishlist-reload').on('click', loadFavorites);
-
-	jQuery('#btn-profile-reload').on('click', function(event) {
-		loadProfile();
+	jQuery('#btn-myproducts').on('click', function(event) {
+		jQuery('#head-menu li').removeClass('active');
+		jQuery('#li-myproducts').addClass('active');
+		jQuery('.site-section').hide();
+		jQuery('#myproducts').show();
 	});
+	jQuery('#btn-wishlist-reload').on('click', function(event) { loadFavorites(); });
+	jQuery('#btn-profile-reload').on('click', function(event) { loadProfile(); });
+	jQuery('#btn-myproducts-reload').on('click', function(event) { loadMyProducts(); });
 
 	jQuery('#btn-profile-save').on('click', function(event) {
 		var obj = buildProfile();
@@ -212,7 +267,51 @@ function foodbook_init() {
 		});
 	});
 
-	loadProfile();
-	loadProducts();
+	jQuery('#products-table').on('click', '.myproducts-add', function(event) {
+		var me = jQuery(this);
+		var tr = me.parent().parent();
+		var id = tr.data('id');
+
+		var product = getProductById(id);
+
+		if (window.confirm("Add product '" + product.name + "'?")) {
+			console.log("Adding...");
+			jQuery.ajax('/myproducts/add/' + id).done(function(data) {
+				if (!data.product_id) {
+					timedMessage('Something went wrong when changing myproduct...', 5000, 'bg-danger');
+					return;
+				}
+				myproducts.push(data.product_id);
+				rebuildMyProductsTable();
+			});
+		}
+	});
+
+	jQuery('#myproducts-table').on('click', '.myproduct-remove', function(event) {
+		var id = jQuery(this).data('id');
+
+		jQuery.ajax('/myproducts/remove/' + id).done(function(data) {
+			if (!data.product_id) {
+				timedMessage('Something went wrong when changing myproduct...', 5000, 'bg-danger');
+				return;
+			}
+
+			// Remove from list
+			var idx = myproducts.indexOf(id);
+			if (idx > -1)
+				myproducts.splice(idx, 1);
+
+			jQuery('#myproduct-' + id).remove();
+		});
+	});
+
+	loadProfile(function(profile) {
+		loadProducts(function() {
+			if (profile.host) {
+				loadMyProducts();
+				//loadRequests();
+			}
+		});
+	});
 }
 

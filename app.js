@@ -358,5 +358,113 @@ dispatch.map('GET', '/favorite/remove/([0-9]*)$', function(ret, res) {
 	});
 });
 
+dispatch.map('GET', '/myproducts$', function(ret, res) {
+	var self = this;
+
+	console.log(this.matches);
+	var id = this.matches[1];
+
+	// Check login
+	var cookie = '';
+	if (this.headers.hasOwnProperty('cookie'))
+		cookie = this.headers.cookie;
+
+	getUser(cookie, function(err, profile) {
+		if (err) {
+			console.error(err);
+			self('[]', { 'Content-Type': 'application/json' });
+			return;
+		}
+
+		db.all('SELECT * FROM user_products WHERE user_id = ?', [ profile.id ], function(err, rows) {
+			if (err) {
+				console.error(err);
+				self('{}', { 'Content-Type': 'application/json' });
+			}
+
+			var ret = [];
+			rows.forEach(function(row) {
+				ret.push(row.product_id);
+			});
+
+			self(JSON.stringify(ret), { 'Content-Type': 'application/json' });
+		});
+	});	
+});
+
+dispatch.map('GET', '/myproducts/add/([0-9]*)$', function(ret, res) {
+	var self = this;
+	console.log(this.matches);
+	var id = this.matches[1];
+
+	// Check login
+	var cookie = '';
+	if (this.headers.hasOwnProperty('cookie'))
+		cookie = this.headers.cookie;
+
+	getUser(cookie, function(err, profile) {
+		if (err) {
+			console.error(err);
+			self('{}', { 'Content-Type': 'application/json' });
+			return;
+		}
+
+		db.all('SELECT * FROM user_products WHERE user_id = ?', profile.id, function(err, rows) {
+			if (err) {
+				console.error(err);
+				self('{}', { 'Content-Type': 'application/json' });
+			}
+
+			// Check if we already have this product on our user_products
+			var has = false;
+			rows.forEach(function(row) {
+				if (row.product_id == id) {
+					has = true;
+				}
+			});
+
+			if (has) {
+				self(JSON.stringify({ product_id: id, available: true }), { 'Content-Type': 'application/json' });
+			}
+			else {
+				db.run('INSERT INTO user_products (user_id, product_id, amount) VALUES (?, ?, 1)', [profile.id, id], function(err) {
+					if (err) {
+						console.error(err);
+						self('{}', { 'Content-Type': 'application/json' });
+					}
+					self(JSON.stringify({ product_id: id, available: true }), { 'Content-Type': 'application/json' });
+				});
+			}
+		});
+	});
+});
+
+dispatch.map('GET', '/myproducts/remove/([0-9]*)$', function(ret, res) {
+	var self = this;
+	console.log(this.matches);
+	var id = this.matches[1];
+
+	// Check login
+	var cookie = '';
+	if (this.headers.hasOwnProperty('cookie'))
+		cookie = this.headers.cookie;
+
+	getUser(cookie, function(err, profile) {
+		if (err) {
+			console.error(err);
+			self('{}', { 'Content-Type': 'application/json' });
+			return;
+		}
+
+		db.run('DELETE FROM user_products WHERE user_id = ? AND product_id = ?', [ profile.id, id ], function(err) {
+			if (err) {
+				console.error(err);
+				self('{}', { 'Content-Type': 'application/json' });
+			}
+
+			self(JSON.stringify({ product_id: id, available: false }), { 'Content-Type': 'application/json' });
+		});
+	});
+});
 
 dispatch(3000, { serve_static: true });
