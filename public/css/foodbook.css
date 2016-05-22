@@ -21,8 +21,8 @@
 .product.favorite .on { display: inline-block; }
 .product.favorite .off { display: none; }
 
-.host-only-menu { display: none; }
-body.host .host-only-menu { display: inline-block; }
+.host-only-menu { display: none !important; }
+body.host .host-only-menu { display: inline-block !important; }
 
 #footer {
 	margin-top: 1em;
