@@ -9,6 +9,9 @@ CREATE TABLE users (
   description text,
   host int(1) NOT NULL DEFAULT 0
 );
+INSERT INTO users (created, modified, name, email, password, host) VALUES
+('now', 'now', 'User one', 'a@a.com', 'a', 1),
+('now', 'now', 'Another one', 'b@b.com', 'a', 0);
 
 CREATE TABLE products (
   id integer PRIMARY KEY AUTOINCREMENT,
@@ -31,7 +34,7 @@ INSERT INTO products (created, modified, name, manufacturer, code, case_size) VA
 CREATE TABLE user_products (
   user_id integer NOT NULL,
   product_id integer NOT NULL,
-  amount integer NOT NULL,
+  amount integer NOT NULL DEFAULT 1,
   price decimal(10,5),
   PRIMARY KEY(user_id, product_id)
 );
